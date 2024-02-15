@@ -11,7 +11,7 @@ pipeline {
             steps {
                 script {
                     //Check if the commit is a merge commit
-                    def isMergeCommit = sh(script: "git log -1 --pretty=%B | grep 'Merge pull request #'", reurnStdout: true).trim()
+                    def isMergeCommit = sh(script: "git log -1 --pretty=%B | grep 'Merge pull request #'", returnStdout: true).trim()
                     if (isMergeCommit) {
                         //Merge to main
                         sh "git checkout main"
