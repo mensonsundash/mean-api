@@ -10,10 +10,10 @@ pipeline {
         stage('Merge to Main') {
             steps {
                 script {
-                    //Check if the commit is a merge commit
+                    // Check if the commit is a merge commit
                     def isMergeCommit = sh(script: "git log -1 --pretty=%B | grep 'Merge pull request #'", returnStdout: true).trim()
                     if (isMergeCommit) {
-                        //Merge to main
+                        // Merge to main
                         sh "git checkout main"
                         sh "git merge release/V-0.0.1"
                         sh "git push origin main"
