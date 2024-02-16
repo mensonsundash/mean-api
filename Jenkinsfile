@@ -12,7 +12,7 @@ pipeline {
                 script {
                     // Check if the commit is a merge commit
                     def isMergeCommit = bat(script: "git log -1 --pretty=%B | findstr /C:\"Merge pull request #\"", returnStdout: true).trim()
-                    if (isMergeCommit) {
+                    if (!isMergeCommit.isEmpty()) {
                         // Merge to main
                         bat "git checkout main"
                         bat "git merge release/V-0.0.1"
