@@ -11,12 +11,12 @@ pipeline {
             steps {
                 script {
                     // Check if the commit is a merge commit
-                    def isMergeCommit = sh(script: "git log -1 --pretty=%B | grep 'Merge pull request #'", returnStdout: true).trim()
+                    def isMergeCommit = bat(script: "git log -1 --pretty=%B | findstr /C:\"Merge pull request #\"", returnStdout: true).trim()
                     if (isMergeCommit) {
                         // Merge to main
-                        sh "git checkout main"
-                        sh "git merge release/V-0.0.1"
-                        sh "git push origin main"
+                        bat "git checkout main"
+                        bat "git merge release/V-0.0.1"
+                        bat "git push origin main"
                     }
                 }
             }
