@@ -1,26 +1,22 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import connect from './src/utils/connect.js'
+import modelSchema from './src/models/index.js';
+
 const app = express();
 dotenv.config();
+
 const PORT = 8800;
 
-//DB Connection
-
-const connectMongoDB = async () => {
-    try {
-        await mongoose.connect(process.env.MONGO_URI);
-        console.log('Connected to Database');
-    }catch(error){
-        throw(error);
-    }
-}
-//routing endpoint
+//routing endpoint express server
 app.use('/', (req, res) => {
     return res.send(`Node & Express server is running on socket http://localhost:${PORT}`);
 });
 //Creating server
 app.listen(PORT, ()=>{
-    connectMongoDB();
+    //DB Connection
+    connect();
+    //load model schema
+    modelSchema;
     console.log(`Server is running on socket: http://localhost:${PORT}`)
 })
