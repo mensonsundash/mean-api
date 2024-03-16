@@ -1,29 +1,62 @@
 import RoleModel from "../models/role.model.js";
+import { RoleValidation } from "../validators/role.validator.js";
+// import Joi from "joi";
+
+// const RoleSchema = Joi.object({
+//     role: Joi.string().required()
+// });
 
 export async function createRole(req, res, next) {
     try{
-        if(req.body.role && req.body.role !== '') {
-            const newRole = new RoleModel(req.body);
-            await newRole.save();
-            return res.send("Role Created");
-        }else{
-            return res.status(400).send("Bad Request");
+        const validator = new RoleValidation("create");
+        const {error, value} = validator.validate(req.body);
+        
+        if(error){
+            console.log(error);
+            return res.status(400).send(error.details);
         }
+
+
+        // if(validator.validate(req.body)){
+            // const value = validator.value;
+            
+            if(value.role && value.role !== '') {
+                const newRole = new RoleModel(value);//value returned by validator after validation
+                await newRole.save();
+                return res.send(newRole);
+            }else{
+                return res.status(400).send("Bad Request");
+            }
+        // }else{
+        //     const errors = validator.errors;
+        //     console.log(errors);
+        //     return res.status(400).send(errors);
+        // }
+            
     } catch(error) {
         return res.status(500).send("Internal Server Error!");
     }
 }
 
 export async function updateRole(req, res, next) {
-    try{
-        const role = await RoleModel.findById({_id: req.params.id});
+    try{    
+        const {params, body} = req;
+        const validator = new RoleValidation("update");
+        const {error, value} = validator.validate({...params, ...body});
+        
+        if(error){
+            console.log(error);
+            return res.status(400).send(error.details);
+        }
+
+        const role = await RoleModel.findById({_id: value.id}); //value returned by validator after validation
         if(role){
             const newData = await RoleModel.findByIdAndUpdate(
-                req.params.id,
-                {$set: req.body},
+                value.id,
+                {$set: value},
                 {new: true}
             );
-            return res.status(200).send("Role updated!");
+            return res.status(200).send(newData);
         }else{
             return  res.status(404).send("Role not found");
         }
@@ -34,7 +67,16 @@ export async function updateRole(req, res, next) {
 
 export async function getAllRoles(req, res, next) {
     try{
-        const roles = await RoleModel.find();
+        const {query} = req;
+        const validator = new RoleValidation("list");
+        const {error, value} = validator.validate(query);
+        
+        if(error){
+            console.log(error);
+            return res.status(400).send(error.details);
+        }
+
+        const roles = await RoleModel.find().sort({ updatedAt: -1 });
         // res.json(roles);
         return res.status(200).send(roles);
     }catch(error){
@@ -44,12 +86,24 @@ export async function getAllRoles(req, res, next) {
 
 export async function deleteRole(req, res, next) {
     try{
-        const roleId = req.params.id;
-        const role = await  RoleModel.findById({_id: roleId});
+        const {params} = req;
+        const validator = new RoleValidation("delete");
+        const {error, value} = validator.validate({...params});
+        
+        if(error){
+            console.log(error);
+            return res.status(400).send(error.details);
+        }
+
+        const roleId = value.id; //value returned by validator after validation
+        
+        const role = await RoleModel.findById({_id: roleId});
+        
         if(role){
             await RoleModel.findByIdAndDelete(roleId);
             return res.status(200).send("Role Deleted!")
         }
+        next();
     }catch(error){
 
     }
