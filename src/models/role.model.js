@@ -4,7 +4,8 @@ import { getCollectionName } from "../utils/pluralize.js";
 const RoleSchema = new mongoose.Schema({
     role:{
         type: String,
-        required: true
+        required: true,
+        unique: true
     }
 },{
     timestamps: true
