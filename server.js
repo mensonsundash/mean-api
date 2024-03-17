@@ -21,6 +21,20 @@ app.use(bodyParser.json());
 
 //routes api gateway
 app.use('/api', routes);
+
+//Response Handler Middleware
+app.use((obj, req, res, next) => {
+    const statusCode = obj.status || 500;
+    const errorMessage = obj.message || "Internal Server Error!";
+    return res.status(statusCode).json({
+        success: [200,201,204].some( a => a === obj.status) ? true: false,
+        status: statusCode,
+        message: errorMessage,
+        data: obj.data
+        // stack: err.stack
+    })
+});
+
 //Creating server
 app.listen(PORT, ()=>{
     //DB Connection

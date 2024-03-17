@@ -1,5 +1,7 @@
 import RoleModel from "../models/role.model.js";
 import { RoleValidation } from "../validators/role.validator.js";
+import { CreateError, CreateSuccess } from "../utils/responseHandler.js";
+
 // import Joi from "joi";
 
 // const RoleSchema = Joi.object({
@@ -13,7 +15,8 @@ export async function createRole(req, res, next) {
         
         if(error){
             console.log(error);
-            return res.status(400).send(error.details);
+            // return res.status(400).send(error.details);
+            return next(CreateError(400, error.details));
         }
 
 
@@ -23,9 +26,11 @@ export async function createRole(req, res, next) {
             if(value.role && value.role !== '') {
                 const newRole = new RoleModel(value);//value returned by validator after validation
                 await newRole.save();
-                return res.send(newRole);
+                // return res.send(newRole);
+                return next(CreateSuccess(200, "Role created successfully!", newRole));
             }else{
-                return res.status(400).send("Bad Request");
+                // return res.status(400).send("Bad Request");
+                return next(CreateError(400, "Bad Request!"));
             }
         // }else{
         //     const errors = validator.errors;
@@ -34,7 +39,8 @@ export async function createRole(req, res, next) {
         // }
             
     } catch(error) {
-        return res.status(500).send("Internal Server Error!");
+        // return res.status(500).send("Internal Server Error!");
+        return next(CreateError(500, "Internal Server Error!"));
     }
 }
 
@@ -46,7 +52,8 @@ export async function updateRole(req, res, next) {
         
         if(error){
             console.log(error);
-            return res.status(400).send(error.details);
+            // return res.status(400).send(error.details);
+            return next(CreateError(400, error.details));
         }
 
         const role = await RoleModel.findById({_id: value.id}); //value returned by validator after validation
@@ -56,12 +63,15 @@ export async function updateRole(req, res, next) {
                 {$set: value},
                 {new: true}
             );
-            return res.status(200).send(newData);
+            // return res.status(200).send(newData);
+            return next(CreateSuccess(200, "Update Successful!", newData));
         }else{
-            return  res.status(404).send("Role not found");
+            // return  res.status(404).send("Role not found");
+            return next(CreateError(404, "Role not found!"));
         }
     }catch(error){
-        return  res.status(500).send("Internal Server Error!");
+        // return  res.status(500).send("Internal Server Error!");
+        return next(CreateError(500, "Internal Server Error!"));
     }
 }
 
@@ -73,14 +83,17 @@ export async function getAllRoles(req, res, next) {
         
         if(error){
             console.log(error);
-            return res.status(400).send(error.details);
+            // return res.status(400).send(error.details);
+            return next(CreateError(400, error.details));
         }
 
         const roles = await RoleModel.find().sort({ updatedAt: -1 });
         // res.json(roles);
-        return res.status(200).send(roles);
+        // return res.status(200).send(roles);
+        return next(CreateSuccess(200, "Roles Sucessfully listed!", roles));
     }catch(error){
-        return res.status(500).send("Internal Server Error!");
+        // return res.status(500).send("Internal Server Error!");
+        return next(CreateError(500, "Internal Server Error!"));
     }
 }
 
@@ -92,7 +105,8 @@ export async function deleteRole(req, res, next) {
         
         if(error){
             console.log(error);
-            return res.status(400).send(error.details);
+            // return res.status(400).send(error.details);
+            return next(CreateError(400, error.details));
         }
 
         const roleId = value.id; //value returned by validator after validation
@@ -101,10 +115,11 @@ export async function deleteRole(req, res, next) {
         
         if(role){
             await RoleModel.findByIdAndDelete(roleId);
-            return res.status(200).send("Role Deleted!")
+            // return res.status(200).send("Role Deleted!")
+            return next(CreateSuccess(200, "Role Deleted!"));
         }
         next();
     }catch(error){
-
+        return next(CreateError(500, "Internal Server Error!"));
     }
 }
