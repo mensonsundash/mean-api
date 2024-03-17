@@ -20,6 +20,12 @@ for (const file of files) {
     const importedModule  = await import(moduleURL.href);
     
     if (importedModule.default) {
+        // const schema = importedModule.default;
+        // schema.set('collection', getCollectionName(modelName));
+        // schema.set('timestamps', {
+        //     createdAt: 'created_at',
+        //     updatedAt: 'updated_at'
+        // });
         modelSchema[modelName] = importedModule.default;//mongoose.model(modelName, schema);
     } else {
         console.error(`Default export not found in ${file}`);
