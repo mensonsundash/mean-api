@@ -4,6 +4,7 @@ import connect from './src/utils/connect.js'
 import modelSchema from './src/models/index.js';
 import routes from './src/routes/index.js';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 dotenv.config();
@@ -13,6 +14,9 @@ const PORT = 8800;
 //bodyparser setup allowing to req, res in json between db & server
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+//Cookie Parser
+app.use(cookieParser());
 
 // //routing endpoint express server
 // app.use('/', (req, res) => {
@@ -30,8 +34,8 @@ app.use((obj, req, res, next) => {
         success: [200,201,204].some( a => a === obj.status) ? true: false,
         status: statusCode,
         message: errorMessage,
-        data: obj.data
-        // stack: err.stack
+        data: obj.data,
+        // stack: obj.stack
     })
 });
 
