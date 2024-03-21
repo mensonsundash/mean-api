@@ -5,6 +5,7 @@ import modelSchema from './src/models/index.js';
 import routes from './src/routes/index.js';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
 const app = express();
 dotenv.config();
@@ -18,6 +19,22 @@ app.use(bodyParser.json());
 //Cookie Parser
 app.use(cookieParser());
 
+//CORS Policy Middleware
+app.use(cors({
+    origin: "http://localhost:4200",
+    credentials: true
+}));
+// app.options("*", cors());
+// app.use(function(req,res,next){
+//     //Enabling Cors
+//     res.header("Access-Control-Allow-Origin", "*");
+//     res.header("Access-Control-Allow-Origin", "GET,HEAD,OPTIONS,POST,PUT");
+//     res.header(
+//         "Access-Control-Allow-Origin", 
+//         "Origin, X-Requested-With, contentType, Content-Type, Accept, Authorization, x-access-token"
+//     );
+//     next();
+// });
 // //routing endpoint express server
 // app.use('/', (req, res) => {
 //     return res.send(`Node & Express server is running on socket http://localhost:${PORT}`);
