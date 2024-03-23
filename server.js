@@ -1,5 +1,5 @@
 import express from 'express';
-import dotenv from 'dotenv';
+// import dotenv from 'dotenv';
 import connect from './src/utils/connect.js'
 import modelSchema from './src/models/index.js';
 import routes from './src/routes/index.js';
@@ -9,7 +9,7 @@ import cors from 'cors';
 import globalUrl from './src/config/global.config.js';
 
 const app = express();
-dotenv.config();
+// dotenv.config();
 
 const PORT = process.env.PORT || 8800;
 
