@@ -6,6 +6,7 @@ import routes from './src/routes/index.js';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import globalUrl from './src/config/global.config.js';
 
 const app = express();
 dotenv.config();
@@ -21,7 +22,7 @@ app.use(cookieParser());
 
 //CORS Policy Middleware
 app.use(cors({
-    origin: "http://localhost:4200",
+    origin: globalUrl.web_url,
     credentials: true
 }));
 // app.options("*", cors());
