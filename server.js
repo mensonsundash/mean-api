@@ -11,7 +11,7 @@ import globalUrl from './src/config/global.config.js';
 const app = express();
 dotenv.config();
 
-const PORT = 8800;
+const PORT = process.env.PORT || 8800;
 
 //bodyparser setup allowing to req, res in json between db & server
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -37,9 +37,9 @@ app.use(cors({
 //     next();
 // });
 // //routing endpoint express server
-// app.use('/', (req, res) => {
-//     return res.send(`Node & Express server is running on socket http://localhost:${PORT}`);
-// });
+app.get('/', (req, res) => {
+    return res.send(`Node & Express server is running on PORT :${PORT}`);
+});
 
 //routes api gateway
 app.use('/api', routes);
