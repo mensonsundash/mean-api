@@ -41,6 +41,11 @@ app.get('/', (req, res) => {
     return res.send(`Node & Express server is running on PORT :${PORT}`);
 });
 
+//DB Connection
+connect();
+//load model schema
+modelSchema;
+
 //routes api gateway
 app.use('/api', routes);
 
@@ -58,11 +63,8 @@ app.use((obj, req, res, next) => {
 });
 
 //Creating server
-app.listen(PORT, ()=>{
-    //DB Connection
-    connect();
-    //load model schema
-    modelSchema;
+app.listen(PORT, async()=>{
+    
     
     console.log(`Server is running on socket: http://localhost:${PORT}`)
 })
