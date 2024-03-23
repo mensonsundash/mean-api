@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import dotenv from 'dotenv';
+// import dotenv from 'dotenv';
 // import db_config from "../config/db.config";
-dotenv.config();
+// dotenv.config();
 
 async function connect() {
     try{
