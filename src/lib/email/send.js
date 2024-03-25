@@ -7,11 +7,11 @@ import juice from 'juice';
 import { CreateError, CreateSuccess } from '../../utils/responseHandler.js';
 
 const smtp = nodemailer.createTransport({
-    host: smtpConfig.smtp.host,
-    port: smtpConfig.smtp.port,
+    host: `'${smtpConfig.smtp.host}'`,
+    port: `'${smtpConfig.smtp.port}'`,
     auth:{
-        user: smtpConfig.smtp.username,
-        pass: smtpConfig.smtp.password
+        user: `'${smtpConfig.smtp.username}'`,
+        pass: `'${smtpConfig.smtp.password}'`
     }
 });
 
@@ -28,7 +28,7 @@ const mailSent = async({
         const headerTemplatePath = `./src/lib/email/templates/header.html`;
         const footerTemplatePath = `./src/lib/email/templates/footer.html`;
 
-        restOfOptions.from = smtpConfig.support.email;
+        restOfOptions.from = `'${smtpConfig.support.email}'`;
 
         const options = {
             ...restOfOptions
