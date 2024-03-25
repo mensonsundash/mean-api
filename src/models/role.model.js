@@ -6,6 +6,13 @@ const RoleSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true
+    },
+    state:{
+        type: Number,
+        require: true,
+        enum: [0, 1],
+        default: 1,
+        comment: '0 - INACTIVE, 1 - ACTIVE'
     }
 },{
     timestamps: true

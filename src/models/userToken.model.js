@@ -11,6 +11,13 @@ const UserTokenSchema = new mongoose.Schema({
             type: String,
             required: true
         },
+        state:{
+            type: Number,
+            require: true,
+            enum: [0, 1],
+            default: 1,
+            comment: '0 - INACTIVE, 1 - ACTIVE'
+        },
         createdAt: {
             type: Date,
             default: Date.now,
