@@ -8,12 +8,19 @@ import UserTokenModel from "../models/userToken.model.js";
 // import nodemailer from 'nodemailer';
 import globalUrl from "../config/global.config.js";
 import mailSent from "../lib/email/send.js";
+import { UserValidator } from "../validators/user.validator.js";
 
 
 export async function register(req, res, next) {
     try{
+        const { body } = req;
+        const validator = new UserValidator("create");
+        const {error, value} = validator.validate(body)
+        if(error){
+            return next(CreateError(400, error.details));
+        }
 
-        const user = await UserModel.findOne({email: req.body.email})
+        const user = await UserModel.findOne({email: value.email})
         .populate("roles", "role");
 
         if(user){
@@ -26,12 +33,12 @@ export async function register(req, res, next) {
         
         const role = await RoleModel.find({role: "User"});
         const salt = await bcrypt.genSalt(10);
-        const hashPassword = await bcrypt.hashSync(req.body.password, salt);
+        const hashPassword = await bcrypt.hashSync(value.password, salt);
         
         const newUser = new UserModel({
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            email: req.body.email,
+            firstName: value.firstName,
+            lastName: value.lastName,
+            email: value.email,
             password: hashPassword,
             roles: role
         });
@@ -44,8 +51,14 @@ export async function register(req, res, next) {
 
 export async function registerAdmin(req, res, next) {
     try{
+        const { body } = req;
+        const validator = new UserValidator("create");
+        const {error, value} = validator.validate(body)
+        if(error){
+            return next(CreateError(400, error.details));
+        }
 
-        const user = await UserModel.findOne({email: req.body.email})
+        const user = await UserModel.findOne({email: value.email})
         .populate("roles", "role");
 
         if(user){
@@ -58,12 +71,12 @@ export async function registerAdmin(req, res, next) {
 
         const role = await RoleModel.find({});
         const salt = await bcrypt.genSalt(10);
-        const hashPassword = await bcrypt.hashSync(req.body.password, salt);
+        const hashPassword = await bcrypt.hashSync(value.password, salt);
         
         const newUser = new UserModel({
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            email: req.body.email,
+            firstName: value.firstName,
+            lastName: value.lastName,
+            email: value.email,
             password: hashPassword,
             isAdmin: true,
             roles: role
@@ -77,7 +90,15 @@ export async function registerAdmin(req, res, next) {
 
 export async function login(req, res, next) {
     try{
-        const user = await UserModel.findOne({email: req.body.email})
+
+        const { body } = req;
+        const validator = new UserValidator("loginCheck");
+        const {error, value} = validator.validate(body)
+        if(error){
+            return next(CreateError(400, error.details));
+        }
+
+        const user = await UserModel.findOne({email: value.email})
         .populate("roles", "role");
 
         if(!user){
@@ -85,7 +106,7 @@ export async function login(req, res, next) {
         }
 
         const { roles } = user;
-        const isPasswordCorrect = await bcrypt.compare(req.body.password, user.password);
+        const isPasswordCorrect = await bcrypt.compare(value.password, user.password);
         if(!isPasswordCorrect){
             // return res.status(400).send({status:400, message: "Password is incorrect!"});
             return next(CreateError(400, "Password is incorrect!"));
@@ -148,7 +169,14 @@ export async function login(req, res, next) {
 
 export async function forgetPassword(req, res, next) {
     try{
-        const email = req.body.email;
+        const { body } = req;
+        const validator = new UserValidator("forgetCheck");
+        const {error, value} = validator.validate(body)
+        if(error){
+            return next(CreateError(400, error.details));
+        }
+
+        const email = value.email;
         const user = await UserModel.findOne({email: {$regex: '^' + email + '$', $options: 'i'} });
 
         if(!user){
@@ -156,7 +184,7 @@ export async function forgetPassword(req, res, next) {
         }
         
         const expirySeconds = 0;//0 second
-        const expiryMinutes = 15; //15 minutes
+        const expiryMinutes = 25; //25 minutes
         const expiryHours = 0; //0 hrs
         const expiryTimeInMilliseconds = (expirySeconds + expiryMinutes * 60 + expiryHours * 60 * 60) * 1000;
 
@@ -173,7 +201,7 @@ export async function forgetPassword(req, res, next) {
         const web_url = globalUrl.web_url;
         const resetLink = web_url +`/auth/reset-password/${newToken.token}`;
         
-        mailSent({
+        const emailSentSuccessfully = await mailSent({
                 to: user.email,
                 subject: 'Reset your password',
                 template: 'reset-password',
@@ -186,8 +214,11 @@ export async function forgetPassword(req, res, next) {
                 newToken
             });
         
-
-        return next(CreateSuccess(200, 'Email sent', resetLink));
+        if (emailSentSuccessfully) {
+            return next(CreateSuccess(200, 'Email sent', resetLink));
+        } else {
+            return next(CreateError(500, 'Failed to send email'));
+        }
     
     }catch(error){
         return next(CreateError(500, "Internal Server Error!"));
@@ -196,13 +227,22 @@ export async function forgetPassword(req, res, next) {
 
 export async function resetPassword(req, res, next) {
     try{
-        const token = req.body.token;
-        const newPassword = req.body.password;
+        const { body } = req;
+        const validator = new UserValidator("resetCheck");
+        
+        var {error, value} = validator.validate(body)
+        if(error){
+            return next(CreateError(400, error.details));
+        }
+        
 
-        const {decoded, valid, expired, error} = verifyJwt(token);
+        const token = value.token;
+        const newPassword = value.password;
+
+        var {decoded, valid, expired, error} = verifyJwt(token);
 
         if(error){
-            return next(CreateError(500, "Reset Link is expired"));
+            return next(CreateError(401, "Password reset Link is expired"));
         }
 
         if(decoded){
@@ -214,7 +254,7 @@ export async function resetPassword(req, res, next) {
             const encryptPassword = await bcrypt.hash(newPassword, salt);
 
             var oldPassword = bcrypt.compareSync(
-                req.body.password,
+                value.password,
                 user.password
             );
 
