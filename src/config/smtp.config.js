@@ -1,18 +1,16 @@
 /**
  * SendInBlue Account for SMTP
  * */
-import dotenv from 'dotenv';
-dotenv.config();
 
 const smtpConfig = {
     smtp: {
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
-        username: process.env.SMTP_USERNAME,
-        password: process.env.SMTP_PASSWORD
+        host: 'smtp-relay.brevo.com',
+        port: 587,
+        username: 'menson.sundash@gmail.com',
+        password: '1Cs7OFpBSdr5hNbH'
     },
     support: {
-        email: process.env.SMTP_USERNAME,
+        email: 'menson.sundash@gmail.com',
         name: 'MEAN Admin'
     }
 };
