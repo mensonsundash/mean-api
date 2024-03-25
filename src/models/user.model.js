@@ -32,6 +32,13 @@ const UserSchema = new mongoose.Schema({
         type: [Schema.Types.ObjectId],
         required: true,
         ref:"Role"
+    },
+    state:{
+        type: Number,
+        require: true,
+        enum: [0, 1],
+        default: 1,
+        comment: '0 - INACTIVE, 1 - ACTIVE'
     }
 },{
     timestamps: true
