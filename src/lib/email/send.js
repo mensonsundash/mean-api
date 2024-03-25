@@ -6,12 +6,21 @@ import { htmlToText } from 'html-to-text';
 import juice from 'juice';
 import { CreateError, CreateSuccess } from '../../utils/responseHandler.js';
 
+// const smtp = nodemailer.createTransport({
+//     host: smtpConfig.smtp.host,
+//     port: smtpConfig.smtp.port,
+//     auth:{
+//         user: smtpConfig.smtp.username,
+//         pass: smtpConfig.smtp.password
+//     }
+// });
+
 const smtp = nodemailer.createTransport({
-    host: `'${smtpConfig.smtp.host}'`,
-    port: `'${smtpConfig.smtp.port}'`,
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
     auth:{
-        user: `'${smtpConfig.smtp.username}'`,
-        pass: `'${smtpConfig.smtp.password}'`
+        user: process.env.SMTP_LOGIN_USERNAME,
+        pass: process.env.SMTP_LOGIN_PASSWORD
     }
 });
 
@@ -28,7 +37,7 @@ const mailSent = async({
         const headerTemplatePath = `./src/lib/email/templates/header.html`;
         const footerTemplatePath = `./src/lib/email/templates/footer.html`;
 
-        restOfOptions.from = `'${smtpConfig.support.email}'`;
+        restOfOptions.from = process.env.SMTP_LOGIN_USERNAME;
 
         const options = {
             ...restOfOptions
