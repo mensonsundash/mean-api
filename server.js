@@ -8,8 +8,10 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import globalUrl from './src/config/global.config.js';
 
-const app = express();
 // dotenv.config();
+
+const app = express();
+
 
 const PORT = process.env.PORT || 8800;
 
