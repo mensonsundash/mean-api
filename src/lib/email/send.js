@@ -30,7 +30,7 @@ const mailSent = async({
         const headerTemplatePath = `./src/lib/email/templates/header.html`;
         const footerTemplatePath = `./src/lib/email/templates/footer.html`;
 
-        restOfOptions.from = smtp.auth.user;
+        restOfOptions.from = smtpConfig.smtp.username;
 
         const options = {
             ...restOfOptions
