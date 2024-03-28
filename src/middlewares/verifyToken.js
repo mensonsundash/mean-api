@@ -20,12 +20,14 @@ import { verifyJwt } from '../utils/jwt.utils.js';
 
 export function verifyToken (req, res, next) {
     // let accessToken = req.cookies.accessToken;
-    const authHeader = req.headers['authorization'];
+    const token = req.headers["x-access-token"];
+
+    // const authHeader = req.headers['authorization'];
     
-    const accessToken = authHeader && authHeader.split(' ')[1];
+    // const accessToken = authHeader && authHeader.split(' ')[1];
     
-    let refreshToken = req.headers['x-refresh']; //get(req, "headers.x-refresh", ""); 
-    
+    // let refreshToken = req.headers['x-refresh']; //get(req, "headers.x-refresh", ""); 
+    const accessToken = token;    
     
     if(!accessToken){
         return next(CreateError(401, "You are not authenticated!"));
@@ -58,7 +60,6 @@ export function verifyToken (req, res, next) {
 
 export const verifyUser = (req, res, next) => {
     verifyToken(req, res, () => {
-        console.log("REQ DTA: ", req);
         if(req.user.id === req.params.id || req.user.isAdmin){
             next();
         }else{

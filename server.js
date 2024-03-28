@@ -1,17 +1,16 @@
-import express from 'express';
-// import dotenv from 'dotenv';
-import connect from './src/utils/connect.js'
-import modelSchema from './src/models/index.js';
-import routes from './src/routes/index.js';
-import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
-import cors from 'cors';
-import globalUrl from './src/config/global.config.js';
+import express from "express";
+// import dotenv from "dotenv";
+import connect from "./src/utils/connect.js";
+import modelSchema from "./src/models/index.js";
+import routes from "./src/routes/index.js";
+import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import globalUrl from "./src/config/global.config.js";
 
 // dotenv.config();
 
 const app = express();
-
 
 const PORT = process.env.PORT || 8800;
 
@@ -23,24 +22,26 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 //CORS Policy Middleware
-app.use(cors({
+app.use(
+  cors({
     origin: globalUrl.web_url,
-    credentials: true
-}));
+    credentials: true,
+  })
+);
 // app.options("*", cors());
 // app.use(function(req,res,next){
 //     //Enabling Cors
 //     res.header("Access-Control-Allow-Origin", "*");
 //     res.header("Access-Control-Allow-Origin", "GET,HEAD,OPTIONS,POST,PUT");
 //     res.header(
-//         "Access-Control-Allow-Origin", 
+//         "Access-Control-Allow-Origin",
 //         "Origin, X-Requested-With, contentType, Content-Type, Accept, Authorization, x-access-token"
 //     );
 //     next();
 // });
 // //routing endpoint express server
-app.get('/', (req, res) => {
-    return res.send(`Node & Express server is running on PORT :${PORT}`);
+app.get("/", (req, res) => {
+  return res.send(`Node & Express server is running on PORT :${PORT}`);
 });
 
 //DB Connection
@@ -49,23 +50,22 @@ connect();
 modelSchema;
 
 //routes api gateway
-app.use('/api', routes);
+app.use("/api", routes);
 
 //Response Handler Middleware
 app.use((obj, req, res, next) => {
-    const statusCode = obj.status || 500;
-    const errorMessage = obj.message || "Internal Server Error!";
-    return res.status(statusCode).json({
-        success: [200,201,204].some( a => a === obj.status) ? true: false,
-        status: statusCode,
-        message: errorMessage,
-        data: obj.data,
-        // stack: obj.stack
-    })
+  const statusCode = obj.status || 500;
+  const errorMessage = obj.message || "Internal Server Error!";
+  return res.status(statusCode).json({
+    success: [200, 201, 204].some((a) => a === obj.status) ? true : false,
+    status: statusCode,
+    message: errorMessage,
+    data: obj.data,
+    // stack: obj.stack
+  });
 });
 
 //Creating server
-app.listen(PORT, async()=>{
-    
-    console.log(`Server is running on socket: http://localhost:${PORT}`)
-})
+app.listen(PORT, async () => {
+  console.log(`Server is running on port: ${PORT}`);
+});
